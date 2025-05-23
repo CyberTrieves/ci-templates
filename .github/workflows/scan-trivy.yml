@@ -30,6 +30,8 @@ jobs:
     name: Trivy SAST scanning
     timeout-minutes: 15
     runs-on: self-hosted
+    container:
+      image: 'aquasec/trivy:0.17.2'
     steps:
       - name: Inputs infos
         run: |
@@ -38,16 +40,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ inputs.python-version }} to install and run Trivy
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ inputs.python-version }}
+      # - name: Set up Python ${{ inputs.python-version }} to install and run Trivy
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ inputs.python-version }}
 
-      - name: Install Trivy
-        run: |
-          echo "Installing Trivy..."
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.17.2
-          trivy --version
+      # - name: Install Trivy
+      #   run: |
+      #     echo "Installing Trivy..."
+      #     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.17.2
+      #     trivy --version
   
       - name: Run Trivy
         run: |
