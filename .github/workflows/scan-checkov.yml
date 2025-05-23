@@ -16,7 +16,7 @@ on:
         type: string
       python-version:
         default: '3.11'
-        description: 'The version of Python to use for the Semgrep installation.'
+        description: 'The version of Python to use for the Checkov installation.'
         required: false
         type: string
 
@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 15
     runs-on: self-hosted
     container: 
-      image: python:3.11
+      image: python:3.11      # need a container to be sure that checkov is installing well 
     steps:
       - name: Inputs infos
         run: |
