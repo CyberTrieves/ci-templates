@@ -9,7 +9,7 @@ permissions:
 on:
   workflow_call:
     inputs:
-      repository:
+      repository-url:
         description: 'The repository to scan. This is the URL of the repository.'
         required: true
         type: string
@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Inputs infos
         run: |
-          echo "Repository to scan: ${{ inputs.repository }}"
+          echo "Repository to scan: ${{ inputs.repository-url }}"
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -48,3 +48,9 @@ jobs:
           echo "Installing Trivy..."
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.17.2
           trivy --version
+  
+      - name: Run Trivy
+        run: |
+          echo "Running Trivy scan..."
+          trivy repo ${{ inputs.repository-url }}
+          echo "Trivy scan completed."
