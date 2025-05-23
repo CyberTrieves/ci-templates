@@ -27,21 +27,18 @@ jobs:
     timeout-minutes: 15
     runs-on: self-hosted
     steps:
-      - name: Inputs infos
-        run: |
-          echo "Working directory: ${{ inputs.working-directory }}"
-          echo "Is blocking: ${{ inputs.is-blocking }}"
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ inputs.python-version }} to install and run Semgrep
+      - name: Set up Python ${{ inputs.python-version }} to install and run Checkov
         uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
 
       - name: Install checkov
         run: |
+          apt install bzip2-devel
+          echo "Installing Checkov..."
           python -m pip install --upgrade pip
           pip install checkov
           checkov --version
