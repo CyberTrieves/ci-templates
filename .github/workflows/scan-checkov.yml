@@ -1,4 +1,4 @@
-name: Semgrep SAST scanning.
+name: Checkov SAST scanning for IaC files.
 
 permissions:
   contents: read
@@ -9,17 +9,6 @@ permissions:
 on:
   workflow_call:
     inputs:
-      working-directory:
-        default: '.'
-        description: 'The working directory to run the scan in. This is relative to the root of the repository.'
-        required: false
-        type: string
-      is-blocking:
-        default: true
-        description: 'Whether the scan should block the workflow if it fails.'
-        required: false
-        # The default value is true, but it can be set to false to allow the workflow to continue even if the scan fails.
-        type: boolean
       python-version:
         default: '3.11'
         description: 'The version of Python to use for the Semgrep installation.'
@@ -27,14 +16,14 @@ on:
         type: string
 
 jobs:
-  semgrep-scan:
+  checkov-scan:
     permissions:
       contents: read          # The contents permission is required to read the repository contents.  
       actions: read           # The actions permission is required to read the actions logs.  
       id-token: write         # The id-token permission is required to authenticate with the GitHub API.
       security-events: write  # The security-events permission is required to write SARIF files to the security events API.
 
-    name: Semgrep SAST scanning
+    name: Checkov SAST scanning
     timeout-minutes: 15
     runs-on: self-hosted
     steps:
@@ -51,27 +40,28 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
 
-      - name: Install Semgrep
+      - name: Install checkov
         run: |
           python -m pip install --upgrade pip
-          pip install semgrep
-          semgrep --version
+          pip install checkov
+          checkov --version
 
-      - name: Run Semgrep rules
+      - name: Run Checkov
         run: |
-          echo "Running Semgrep rules..."
-          semgrep --config auto ${{ inputs.working-directory }} \
-            --sarif-output semgrep.sarif \
-            --json-output semgrep.json
-          echo "Semgrep scan completed."
-          echo "Semgrep scan results:"
-          cat semgrep.sarif
-          echo "Semgrep scan results in JSON format:"
-          cat semgrep.json
+          echo "Running Checkov scan..."
+          checkov --directory ${{ inputs.working-directory }} \
+            --output sarif \
+            --output json \
+            --output-file checkov.sarif,checkov.json
+          echo "Checkov scan completed."
+          echo "Checkov scan results:"
+          cat checkov.sarif
+          echo "Checkov scan results in JSON format:"
+          cat checkov.json
 
       - name: Upload SARIF file to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: semgrep.sarif
-          category: Semgrep SAST analysis
+          sarif_file: checkov.sarif
+          category: Checkov SAST analysis
 
