@@ -31,6 +31,8 @@ jobs:
     name: Checkov SAST scanning
     timeout-minutes: 15
     runs-on: self-hosted
+    container: 
+      image: ghcr.io/andreafiorillo/ubuntu:22.04
     steps:
       - name: Inputs infos
         run: |
