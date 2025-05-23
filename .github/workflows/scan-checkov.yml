@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 15
     runs-on: self-hosted
     container: 
-      image: ubuntu:22.04
+      image: python:3.11
     steps:
       - name: Inputs infos
         run: |
@@ -48,7 +48,6 @@ jobs:
 
       - name: Install checkov
         run: |
-          apt install libbz2-dev
           echo "Installing Checkov..."
           python -m pip install --upgrade pip
           pip install checkov
