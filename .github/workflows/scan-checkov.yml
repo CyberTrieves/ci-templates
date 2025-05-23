@@ -9,6 +9,11 @@ permissions:
 on:
   workflow_call:
     inputs:
+      working-directory:
+        default: '.'
+        description: 'The working directory to run the scan in. This is relative to the root of the repository.'
+        required: false
+        type: string
       python-version:
         default: '3.11'
         description: 'The version of Python to use for the Semgrep installation.'
@@ -27,6 +32,10 @@ jobs:
     timeout-minutes: 15
     runs-on: self-hosted
     steps:
+      - name: Inputs infos
+        run: |
+          echo "Working directory: ${{ inputs.working-directory }}"
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -37,7 +46,7 @@ jobs:
 
       - name: Install checkov
         run: |
-          apt install bzip2-devel
+          apt install libbz2-dev
           echo "Installing Checkov..."
           python -m pip install --upgrade pip
           pip install checkov
