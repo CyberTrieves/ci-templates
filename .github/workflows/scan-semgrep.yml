@@ -37,19 +37,22 @@ jobs:
     name: Semgrep SAST scanning
     timeout-minutes: 15
     runs-on: self-hosted
+    container: 
+      image: python:${{ inputs.python-version }}
     steps:
       - name: Inputs infos
         run: |
+          echo "Image docker used: python: ${{ inputs.python-version }}"
           echo "Working directory: ${{ inputs.working-directory }}"
           echo "Is blocking: ${{ inputs.is-blocking }}"
 
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ inputs.python-version }} to install and run Semgrep
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ inputs.python-version }}
+      # - name: Set up Python ${{ inputs.python-version }} to install and run Semgrep
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ inputs.python-version }}
 
       - name: Install Semgrep
         run: |

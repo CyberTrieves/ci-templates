@@ -32,19 +32,20 @@ jobs:
     timeout-minutes: 15
     runs-on: self-hosted
     container: 
-      image: python:3.11      # need a container to be sure that checkov is installing well 
+      image: python:${{ inputs.python-version }}      # need a container to be sure that checkov is installing well 
     steps:
       - name: Inputs infos
         run: |
+          echo "Image docker used: python: ${{ inputs.python-version }}"
           echo "Working directory: ${{ inputs.working-directory }}"
 
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ inputs.python-version }} to install and run Checkov
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ inputs.python-version }}
+      # - name: Set up Python ${{ inputs.python-version }} to install and run Checkov
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ inputs.python-version }}
 
       - name: Install checkov
         run: |

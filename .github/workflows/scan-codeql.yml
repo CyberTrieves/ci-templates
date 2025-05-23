@@ -23,6 +23,8 @@ jobs:
     name: CodeQL scanning
     timeout-minutes: 15
     runs-on: self-hosted
+    container: 
+      image: github/codeql/codeql-action:latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
