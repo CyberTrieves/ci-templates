@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 15
     runs-on: self-hosted
     container: 
-      image: python:3.11
+      image: python:3.13-slim
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

@@ -14,7 +14,7 @@ on:
         required: true
         type: string
       python-version:
-        default: '3.11'
+        default: '3.13-slim'
         description: 'The version of Python to use for the Trivy installation.'
         required: false
         type: string
