@@ -1,0 +1,75 @@
+name: Checkov SAST scanning for IaC files.
+
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+  security-events: write
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        default: '.'
+        description: 'The working directory to run the scan in. This is relative to the root of the repository.'
+        required: false
+        type: string
+      python-version:
+        default: '3.13-slim'
+        description: 'The version of Python to use for the Checkov installation.'
+        required: false
+        type: string
+
+jobs:
+  checkov-scan:
+    permissions:
+      contents: read          # The contents permission is required to read the repository contents.  
+      actions: read           # The actions permission is required to read the actions logs.  
+      id-token: write         # The id-token permission is required to authenticate with the GitHub API.
+      security-events: write  # The security-events permission is required to write SARIF files to the security events API.
+
+    name: Checkov SAST scanning
+    timeout-minutes: 15
+    runs-on: self-hosted
+    container: 
+      image: python:${{ inputs.python-version }}      # need a container to be sure that checkov is installing well 
+    steps:
+      - name: Inputs infos
+        run: |
+          echo "Image docker used: python: ${{ inputs.python-version }}"
+          echo "Working directory: ${{ inputs.working-directory }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # - name: Set up Python ${{ inputs.python-version }} to install and run Checkov
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ inputs.python-version }}
+
+      - name: Install checkov
+        run: |
+          echo "Installing Checkov..."
+          python -m pip install --upgrade pip
+          pip install checkov
+          checkov --version
+
+      - name: Run Checkov
+        run: |
+          echo "Running Checkov scan..."
+          checkov --directory ${{ inputs.working-directory }} \
+            --output sarif \
+            --output json \
+            --output-file checkov.sarif,checkov.json
+          echo "Checkov scan completed."
+          echo "Checkov scan results:"
+          cat checkov.sarif
+          echo "Checkov scan results in JSON format:"
+          cat checkov.json
+
+      - name: Upload SARIF file to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: checkov.sarif
+          category: Checkov SAST analysis
+

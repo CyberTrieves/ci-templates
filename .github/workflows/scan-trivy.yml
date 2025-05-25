@@ -1,0 +1,47 @@
+name: Trivy SAST scanning.
+
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+  security-events: write
+
+on:
+  workflow_call:
+    inputs:
+      repository-url:
+        description: 'The repository to scan. This is the URL of the repository.'
+        required: true
+        type: string
+      python-version:
+        default: '3.13-slim'
+        description: 'The version of Python to use for the Trivy installation.'
+        required: false
+        type: string
+
+jobs:
+  trivy-scan:
+    permissions:
+      contents: read          # The contents permission is required to read the repository contents.  
+      actions: read           # The actions permission is required to read the actions logs.  
+      id-token: write         # The id-token permission is required to authenticate with the GitHub API.
+      security-events: write  # The security-events permission is required to write SARIF files to the security events API.
+
+    name: Trivy SAST scanning
+    timeout-minutes: 15
+    runs-on: self-hosted
+    container:
+      image: 'aquasec/trivy:0.17.2'
+    steps:
+      - name: Inputs infos
+        run: |
+          echo "Repository to scan: ${{ inputs.repository-url }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+  
+      - name: Run Trivy
+        run: |
+          echo "Running Trivy scan..."
+          trivy repo ${{ inputs.repository-url }}
+          echo "Trivy scan completed."
